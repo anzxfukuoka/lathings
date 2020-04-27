@@ -122,6 +122,7 @@ def echo_all(message):
             new += "хуе" + word[2:] + " "
         else:
             new += word + " "
+    new += "."
     bot.reply_to(message, new)
 
 
