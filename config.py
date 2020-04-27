@@ -7,4 +7,8 @@ help_msg = """
 /start - start
 /help - help
 /to_stairs - ??? ?? ?
+/input - 
+/sum - сложение матриц
+/dot - умножение матриц
+/stairs - к ступенчатому виду
 """

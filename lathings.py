@@ -29,7 +29,6 @@ def _devieble(a, b):
     else:
         return b // a
 
-
 def stairs(n, m, matr):
 
     log = Logger()
@@ -113,6 +112,23 @@ def stairs(n, m, matr):
 
     return log.get()
 
+###################################################################
+
+def dot(A, B):
+    try:
+        return str(A) + "\n * \n" + str(B) + "\n = \n" + str(np.dot(A, B))
+    except ValueError as e:
+        #return str(e)
+        return "матрицы не совместимы: m1 (" + str(A.shape[1]) + ") =! n2 (" + str(B.shape[0]) + ")"
+
+def sum(A, B):
+    try:
+        if A.shape != B.shape:
+            raise ValueError
+        return str(A) + "\n + \n" + str(B) + "\n = \n" + str(A + B)
+    except ValueError as e:
+        #return str(e)
+        return "матрицы не совместимы"
 
 # debug
 if __name__ == "__main__":

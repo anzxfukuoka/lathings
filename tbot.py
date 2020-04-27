@@ -5,10 +5,45 @@ import telebot
 import lathings
 import numpy as np
 import config as cf
+import ui
+from ui import MI
+
 
 bot = telebot.TeleBot(cf.token)
 
 server = Flask(__name__)
+
+Mi = MI(bot)
+
+stack = []
+stack_count = 2
+do = None
+
+def Stack(_do, message):
+    global do
+    do = _do
+    _stack(None, message)
+
+def _stack(matr, msg):
+    global stack
+    global do
+
+    Mi.clear()
+    Mi.set_on_ok(_stack)
+
+    if matr is not None:
+        stack.append(matr)
+
+    if len(stack) < stack_count:
+        print("?")
+        Mi.input(msg)
+    else:
+        if callable(do):
+            bot.send_message(msg.chat.id, do(stack[0],stack[1]))
+            print(do(stack[0],stack[1]))
+            stack = []
+            do = None
+
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -18,6 +53,31 @@ def send_welcome(message):
 @bot.message_handler(commands=['help'])
 def send_help(message):
     bot.send_message(message.chat.id, cf.help_msg)
+
+@bot.message_handler(commands=['input'])
+def testinput(message):
+    bot.send_message(message.chat.id, "♥")
+    Mi.clear()
+    Mi.input(message)
+
+@bot.message_handler(commands=['dot'])
+def dot(message):
+    Stack(lathings.dot, message)
+
+@bot.message_handler(commands=['sum'])
+def dot(message):
+    Stack(lathings.sum, message)
+
+@bot.message_handler(commands=['stairs'])
+def stairs_v2(message):
+    Mi.clear()
+    Mi.set_on_ok(stairs_next)
+    Mi.input(message)
+
+def stairs_next(matr, msg):
+    n = matr.shape[0]
+    m = matr.shape[1]
+    bot.send_message(msg.chat.id, lathings.stairs(n, m, matr))
 
 step = 0
 n = 0
@@ -51,7 +111,6 @@ def to_stairs(message):
         bot.send_message(message.chat.id, e)
         step = 0
 
-
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
     print(message.from_user.first_name + ": " + message.text)
@@ -65,6 +124,11 @@ def echo_all(message):
             new += word + " "
     bot.reply_to(message, new)
 
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    #обработка ввода матрицы
+    Mi.keyboard_callback(call)
 
 @server.route('/' + cf.token, methods=['POST'])
 def getMessage():
